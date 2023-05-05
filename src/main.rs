@@ -29,7 +29,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let (port, mongo_uri) = kayo_api::config::from_env();
 
     info!("🔌  Connecting to MongoDB...");
-    let client = Client::with_uri_str(mongo_uri).await?;
+    let client = match Client::with_uri_str(&mongo_uri).await {
+        Ok(value) => value,
+        Err(_) => panic!("Could connect to MongoDB using URI {mongo_uri}")
+    };
 
     // build our application with a route
     let app = Router::new()
@@ -39,7 +42,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // run it
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
-    info!("🚀 KAY/O is online on {addr}");
+    info!("🚀 KAY/O is online on http://{addr}");
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .with_graceful_shutdown(shutdown_signal())
