@@ -6,7 +6,7 @@
 
 on: [push, pull_request]
 
-name: KAY/O DELIVERY
+name: KAY/O CHECKUP
 
 jobs:
   check:
