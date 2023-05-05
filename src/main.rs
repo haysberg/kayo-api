@@ -1,10 +1,8 @@
-extern crate dotenv;
-
 use tracing::{info};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, fmt};
 use tower_http::trace::TraceLayer;
 use axum::{Router};
-use std::{net::SocketAddr, fmt::Debug};
+use std::{net::SocketAddr};
 use kayo_api::routes;
 use tokio::signal;
 

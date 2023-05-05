@@ -1,4 +1,4 @@
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use tracing::{error};
 
 pub fn from_env() -> u16 {
