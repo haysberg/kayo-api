@@ -1,41 +1,19 @@
 # Build Stage
 FROM rust:latest as builder
+WORKDIR /app
 
-RUN USER=root cargo new --bin axum-demo
-WORKDIR ./axum-demo
-COPY ./Cargo.toml ./Cargo.toml
+COPY . .
 # Build empty app with downloaded dependencies to produce a stable image layer for next build
 RUN cargo build --release
 
-# Build web app with own code
-RUN rm src/*.rs
-ADD . ./
-RUN rm ./target/release/deps/axum_demo*
-RUN cargo build --release
+FROM alpine:latest
 
-
-FROM debian:buster-slim
-ARG APP=/usr/src/app
-
-RUN apt-get update \
-    && apt-get install -y ca-certificates tzdata \
-    && rm -rf /var/lib/apt/lists/*
+# RUN apk update -y \
+#     && apk install -y ca-certificates \
+#     && apk upgrade -y
 
 EXPOSE 3000
 
-ENV TZ=Etc/UTC \
-    APP_USER=appuser
+COPY --from=builder /app/target/release/kayo-api /app/kayo-api
 
-RUN groupadd $APP_USER \
-    && useradd -g $APP_USER $APP_USER \
-    && mkdir -p ${APP}
-
-COPY --from=builder /axum-demo/target/release/axum-demo ${APP}/axum-demo
-COPY --from=builder /axum-demo/static ${APP}/static
-
-RUN chown -R $APP_USER:$APP_USER ${APP}
-
-USER $APP_USER
-WORKDIR ${APP}
-
-CMD ["./axum-demo"]
+CMD ["/app/kayo-api"]
