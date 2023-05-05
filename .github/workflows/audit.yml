@@ -13,8 +13,7 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/audit-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: cargo audit your Rust Dependencies
+        uses: actions-rust-lang/audit@v1.1.6
+    
 
