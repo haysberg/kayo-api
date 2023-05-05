@@ -5,9 +5,11 @@ use axum::{Router};
 use std::{net::SocketAddr};
 use kayo_api::routes;
 use tokio::signal;
+use mongodb::Client;
+use std::error::Error;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn Error>> {
     // We initialize the logs formatting
     let format = fmt::format()
         .with_level(true)
@@ -24,7 +26,10 @@ async fn main() {
 
     info!("⚙️  Logger initialized. Loading parameters...");
 
-    let port = kayo_api::config::from_env();
+    let (port, mongo_uri) = kayo_api::config::from_env();
+
+    info!("🔌  Connecting to MongoDB...");
+    let client = Client::with_uri_str(mongo_uri).await?;
 
     // build our application with a route
     let app = Router::new()
@@ -41,6 +46,7 @@ async fn main() {
         .await
         .unwrap();
 
+    Ok(())
 }
 
 // notify os that process will stop
