@@ -1,15 +1,17 @@
-use tracing::{info};
+use tracing::info;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, fmt};
 use tower_http::trace::TraceLayer;
 use axum::{Router};
 use std::{net::SocketAddr};
+use kayo_api::functions::get_leagues;
 use kayo_api::routes;
 use tokio::signal;
-use mongodb::Client;
-use std::error::Error;
+use serde_json::Result;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
+async fn main() -> Result<()> {
+    
+
     // We initialize the logs formatting
     let format = fmt::format()
         .with_level(true)
@@ -26,13 +28,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     info!("⚙️  Logger initialized. Loading parameters...");
 
-    let (port, mongo_uri) = kayo_api::config::from_env();
+    let port = kayo_api::config::from_env();
 
-    info!("🔌  Connecting to MongoDB...");
-    let client = match Client::with_uri_str(&mongo_uri).await {
-        Ok(value) => value,
-        Err(_) => panic!("Could connect to MongoDB using URI {mongo_uri}")
-    };
+    info!("Initializing leagues...");
+    get_leagues().await;
+    // static mut leagues : Value = match getLeagues() {
+    //     Ok(json) => json,
+    //     Err(e) => panic!("Could not update leagues ! Here is the stack : {e}"),
+    // };
 
     // build our application with a route
     let app = Router::new()

@@ -1,7 +1,7 @@
 use dotenvy::dotenv;
-use tracing::{error};
+use tracing::error;
 
-pub fn from_env() -> (u16, String) {
+pub fn from_env() -> u16 {
 
     dotenv().ok();
 
@@ -16,8 +16,5 @@ pub fn from_env() -> (u16, String) {
             3000
         }
     };
-
-    let mongo_uri = std::env::var("MONGO_URI").unwrap_or("mongodb://localhost:27017".into());
-
-    (port, mongo_uri)
+    port
 }
